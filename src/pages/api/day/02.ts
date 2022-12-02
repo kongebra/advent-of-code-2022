@@ -44,12 +44,22 @@ const RULES: Record<Play, Record<Play, Result>> = {
   },
 };
 
-function baseFunction(input: string) {}
+const PART_TWO_RULES: Record<Play, Result> = {
+  rock: "loss",
+  paper: "draw",
+  scissor: "win",
+};
 
-function partOne(input: string) {
+function baseFunction(input: string) {
   const rows = input
     .split("\r\n")
     .map((row) => row.split(" ") as [Input, Input]);
+
+  return rows;
+}
+
+function partOne(input: string) {
+  const rows = baseFunction(input);
 
   const points = rows.map((row) => {
     const [opponent, player] = [TRANSLATOR[row[0]], TRANSLATOR[row[1]]];
@@ -69,7 +79,26 @@ function partOne(input: string) {
 }
 
 function partTwo(input: string) {
-  return null;
+  const rows = baseFunction(input);
+
+  const points = rows.map((row) => {
+    const [opponent, player] = [TRANSLATOR[row[0]], TRANSLATOR[row[1]]];
+
+    const result = PART_TWO_RULES[player];
+
+    const resultScore = RESULT_SCORE[result];
+
+    const playerPlay = getPartTwoPlayerPlay(result, opponent);
+    const playScore = PLAY_SCORE[playerPlay];
+
+    const score = playScore + resultScore;
+
+    return score;
+  });
+
+  const sumPoints = points.reduce((prev, curr) => prev + curr, 0);
+
+  return sumPoints;
 }
 
 export default async function handler(
@@ -84,4 +113,27 @@ export default async function handler(
   };
 
   res.status(200).json(star);
+}
+function getPartTwoPlayerPlay(result: Result, opponent: Play): Play {
+  if (result === "win") {
+    if (opponent === "rock") {
+      return "paper";
+    } else if (opponent === "paper") {
+      return "scissor";
+    } else if (opponent === "scissor") {
+      return "rock";
+    }
+  } else if (result === "draw") {
+    return opponent;
+  } else if (result === "loss") {
+    if (opponent === "rock") {
+      return "scissor";
+    } else if (opponent === "paper") {
+      return "rock";
+    } else if (opponent === "scissor") {
+      return "paper";
+    }
+  }
+
+  return "rock";
 }
