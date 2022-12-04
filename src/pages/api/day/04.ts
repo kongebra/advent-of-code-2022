@@ -22,12 +22,6 @@ function sectionContainsSection([a, b]: SectionPair): boolean {
 
 function baseFunction(input: string) {
   const rows = input.split("\r\n");
-
-  return rows;
-}
-
-function partOne(input: string) {
-  const rows = baseFunction(input);
   const pairs = rows
     .map((row) => row.split(","))
     .map(
@@ -40,6 +34,12 @@ function partOne(input: string) {
         ) as SectionPair
     );
 
+  return pairs;
+}
+
+function partOne(input: string) {
+  const pairs = baseFunction(input);
+
   const pairsOverlap = pairs.map(sectionContainsSection);
   const overlappingCount = pairsOverlap.filter(
     (overlapping) => overlapping === true
@@ -49,9 +49,34 @@ function partOne(input: string) {
 }
 
 function partTwo(input: string) {
-  const rows = baseFunction(input);
+  const pairs = baseFunction(input);
 
-  return null;
+  function helper(section: Section) {
+    const result: number[] = [];
+
+    for (let i = section[0]; i <= section[1]; i++) {
+      result.push(i);
+    }
+
+    return result;
+  }
+
+  const pairsNotOverlapping = pairs.map(([a, b]) => {
+    const arrA = helper(a);
+    const arrB = helper(b);
+
+    const overlappingItems = Array.from(
+      new Set(arrA.filter((A) => arrB.includes(A)))
+    );
+
+    return overlappingItems.length > 0;
+  });
+
+  const count = pairsNotOverlapping.filter(
+    (overlapping) => overlapping === true
+  ).length;
+
+  return count;
 }
 
 export default async function handler(
