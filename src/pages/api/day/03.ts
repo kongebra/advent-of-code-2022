@@ -5,6 +5,16 @@ const ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 type Compartment = [string, string];
 
+function groupBy(input: string[], groupSize: number): string[][] {
+  const groups: string[][] = [];
+
+  for (let i = 0, end = input.length / groupSize; i < end; ++i) {
+    groups.push(input.slice(i * groupSize, (i + 1) * groupSize));
+  }
+
+  return groups;
+}
+
 function findReoccuringCharacter([compA, compB]: Compartment) {
   const compACharacters = compA.split("");
 
@@ -22,7 +32,13 @@ function findReoccuringCharacter([compA, compB]: Compartment) {
 }
 
 function baseFunction(input: string) {
-  const compartments = input.split("\r\n").map((rucksack) => {
+  const compartments = input.split("\r\n");
+
+  return compartments;
+}
+
+function partOne(input: string) {
+  const compartments = baseFunction(input).map((rucksack) => {
     const length = rucksack.length;
     const halfWay = length / 2;
     const firstCompartment = rucksack.slice(0, halfWay);
@@ -30,12 +46,6 @@ function baseFunction(input: string) {
 
     return [firstCompartment, secondCompartemnt] as Compartment;
   });
-
-  return compartments;
-}
-
-function partOne(input: string) {
-  const compartments = baseFunction(input);
 
   const occuringCharacters = compartments.map(findReoccuringCharacter);
   const priorities = occuringCharacters.map(
@@ -48,9 +58,24 @@ function partOne(input: string) {
 }
 
 function partTwo(input: string) {
-  const rows = baseFunction(input);
+  const compartments = baseFunction(input);
+  // group by 3
+  const compartmentGroups = groupBy(compartments, 3);
 
-  return null;
+  const allCharacters = ALPHABET.split("");
+
+  const occuringItems = compartmentGroups
+    .map((group) => {
+      return allCharacters.filter((char) =>
+        group.every((compartment) => compartment.includes(char))
+      );
+    })
+    .flat();
+
+  const priorities = occuringItems.map((char) => ALPHABET.indexOf(char) + 1);
+  const sum = priorities.reduce((prev, curr) => prev + curr, 0);
+
+  return sum;
 }
 
 export default async function handler(
