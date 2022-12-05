@@ -8,8 +8,27 @@ type Instruction = {
   to: number;
 };
 
-function move(board: Board, instruction: Instruction) {
-  const copy = [...board];
+function copyBoard(board: Board): Board {
+  const result: Board = [];
+
+  for (let i = 0; i < board.length; i++) {
+    result.push([...board[i]]);
+  }
+
+  return result;
+}
+
+function printBoard(board: Board) {
+  const longest = Math.max(...board.map((row) => row.length));
+
+  for (let i = 0; i < board.length; i++) {
+    console.log(`${i} ${board[i].join(" ")}`);
+  }
+  console.log(" ");
+}
+
+function movePartOne(board: Board, instruction: Instruction) {
+  const copy = copyBoard(board);
 
   if (instruction.from < 1 || instruction.to > board.length) {
     throw new Error("index out of bounds");
@@ -27,13 +46,46 @@ function move(board: Board, instruction: Instruction) {
   return copy;
 }
 
-function performInstructions(board: Board, instructions: Instruction[]) {
-  let copy = [...board];
+function movePartTwo(board: Board, instruction: Instruction) {
+  const copy = copyBoard(board);
 
-  for (let i = 0; i < instructions.length; i++) {
-    copy = move(copy, instructions[i]);
+  if (instruction.from < 1 || instruction.to > board.length) {
+    throw new Error("index out of bounds");
   }
 
+  const items: string[] = [];
+
+  for (let i = 0; i < instruction.amount; i++) {
+    const item = copy[instruction.from - 1].pop();
+
+    if (item) {
+      items.push(item);
+    } else {
+      throw new Error("cannot pop nothing darling");
+    }
+  }
+
+  copy[instruction.to - 1].push(...items.reverse());
+
+  return copy;
+}
+
+function performInstructionsPartOne(board: Board, instructions: Instruction[]) {
+  let copy = copyBoard(board);
+
+  for (let i = 0; i < instructions.length; i++) {
+    copy = movePartOne(copy, instructions[i]);
+  }
+
+  return copy;
+}
+
+function performInstructionsPartTwo(board: Board, instructions: Instruction[]) {
+  let copy = copyBoard(board);
+
+  for (let i = 0; i < instructions.length; i++) {
+    copy = movePartTwo(copy, instructions[i]);
+  }
   return copy;
 }
 
@@ -111,16 +163,19 @@ function baseFunction(input: string): [Board, Instruction[]] {
 function partOne(input: string) {
   const [board, instructions] = baseFunction(input);
 
-  const result = performInstructions(board, instructions);
+  const result = performInstructionsPartOne(board, instructions);
   const answer = getAnswer(result);
 
   return answer;
 }
 
 function partTwo(input: string) {
-  // const rows = baseFunction(input);
+  const [board, instructions] = baseFunction(input);
 
-  return null;
+  const result = performInstructionsPartTwo(board, instructions);
+  const answer = getAnswer(result);
+
+  return answer;
 }
 
 export default async function handler(
