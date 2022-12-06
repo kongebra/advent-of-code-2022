@@ -3,7 +3,7 @@ import { readInputFile } from "src/utils/input";
 
 function solver(characters: string[], num: number): number {
   for (let i = 0; i < characters.length - num; i++) {
-    let arr: string[] = [];
+    const arr: string[] = [];
     for (let j = 0; j < num; j++) {
       arr.push(characters[i + j]);
     }
@@ -13,8 +13,6 @@ function solver(characters: string[], num: number): number {
     if (set.length === num) {
       return i + num;
     }
-
-    arr = [];
   }
 
   return -1;
