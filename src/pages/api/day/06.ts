@@ -1,6 +1,25 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { readInputFile } from "src/utils/input";
 
+function solver(characters: string[], num: number): number {
+  for (let i = 0; i < characters.length - num; i++) {
+    let arr: string[] = [];
+    for (let j = 0; j < num; j++) {
+      arr.push(characters[i + j]);
+    }
+
+    const set = Array.from(new Set(arr));
+
+    if (set.length === num) {
+      return i + num;
+    }
+
+    arr = [];
+  }
+
+  return -1;
+}
+
 function baseFunction(input: string) {
   const characters = input.split("");
 
@@ -10,28 +29,13 @@ function baseFunction(input: string) {
 function partOne(input: string) {
   const characters = baseFunction(input);
 
-  for (let i = 0; i < characters.length - 4; i++) {
-    let arr: string[] = [];
-    for (let j = 0; j < 4; j++) {
-      arr.push(characters[i + j]);
-    }
-
-    const set = Array.from(new Set(arr));
-
-    if (set.length === 4) {
-      return i + 4;
-    }
-
-    arr = [];
-  }
-
-  return -1;
+  return solver(characters, 4);
 }
 
 function partTwo(input: string) {
   const characters = baseFunction(input);
 
-  return null;
+  return solver(characters, 14);
 }
 
 export default async function handler(
